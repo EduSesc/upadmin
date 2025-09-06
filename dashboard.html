@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UP7 Antigos - Dashboard</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <!-- Favicon (formato .ico) -->
+    <link rel="icon" href="/assets/img/favicon.ico/favicon.ico" type="image/x-icon">
+    <!-- Favicon (PNG) -->
+    <link rel="icon" href="/assets/img/favicon.ico/android-icon-96x96.png" type="image/png">
+    <!-- Favicon para Apple -->
+    <link rel="apple-touch-icon" href="/assets/img/favicon.ico/apple-icon-180x180.png">
+    <!-- Favicon para Windows/Android -->
+    <meta name="msapplication-TileImage" content="/assets/img/favicon.ico/ms-icon-144x144.png">
+    <link rel="stylesheet" href="/assets/css/dashboard.css">
+
+
+</head>
+
+<body>
+
+    <!-- Menu Mobile Inferior -->
+    <div class="mobile-bottom-nav">
+        <a href="dashboard.html" class="mobile-nav-item active">
+            <i class="fas fa-home"></i>
+        </a>
+        <a href="crud.html" class="mobile-nav-item">
+            <i class="fas fa-car"></i>
+        </a>
+        <a href="crudvideos.html" class="mobile-nav-item">
+            <i class="fas fa-video"></i>
+        </a>
+        <a href="crudeventos.html" class="mobile-nav-item">
+            <i class="fas fa-calendar-alt"></i>
+        </a>
+        <a href="crudsorteios.html" class="mobile-nav-item">
+            <i class="fas fa-gift"></i>
+        </a>
+        <a href="crudbanner.html" class="mobile-nav-item">
+            <i class="fas fa-image"></i>
+        </a>
+
+    </div>
+
+    <!-- Header -->
+    <header class="header">
+        <nav class="navbar">
+            <div class="nav-container">
+                <div class="nav-logo">
+                    <a href="index.html" class="logo-link">
+                        <img src="assets/img/logo3.svg" alt="UP7 Antigos Logo" class="logo">
+                    </a>
+                </div>
+            </div>
+
+            <div class="user-info">
+                <div class="user-email" id="user-email">admin@up7antigos.com</div>
+                <button class="logout-btn" id="logout-btn">
+                    <i class="fas fa-sign-out-alt"></i> Sair
+                </button>
+            </div>
+        </nav>
+    </header>
+    <div class="space"></div>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <h1 class="dashboard-title"> Administrativo</h1>
+
+        <div class="dashboard-grid">
+            <!-- Carros -->
+            <div class="dashboard-card card-1" data-url="crud.html">
+                <div class="card-icon">
+                    <i class="fas fa-car"></i>
+                </div>
+                <div class="card-title">CARROS</div>
+            </div>
+
+            <!-- Vídeos -->
+            <div class="dashboard-card card-2" data-url="crudvideos.html">
+                <div class="card-icon">
+                    <i class="fas fa-video"></i>
+                </div>
+                <div class="card-title">VÍDEOS</div>
+            </div>
+
+            <!-- Eventos -->
+            <div class="dashboard-card card-3" data-url="crudeventos.html">
+                <div class="card-icon">
+                    <i class="fas fa-calendar-alt"></i>
+                </div>
+                <div class="card-title">EVENTOS</div>
+            </div>
+
+            <!-- Sorteios -->
+            <div class="dashboard-card card-4" data-url="crudsorteios.html">
+                <div class="card-icon">
+                    <i class="fas fa-gift"></i>
+                </div>
+                <div class="card-title">SORTEIOS</div>
+            </div>
+
+            <!-- Banner -->
+            <div class="dashboard-card card-5" data-url="crudbanner.html">
+                <div class="card-icon">
+                    <i class="fas fa-image"></i>
+                </div>
+                <div class="card-title">BANNER</div>
+            </div>
+
+            <!-- Parceiros -->
+            <div class="dashboard-card card-6" data-url="crudparceiros.html">
+                <div class="card-icon">
+                    <i class="fas fa-handshake"></i>
+                </div>
+                <div class="card-title">PARCEIROS</div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        // Inicializar Supabase - SUBSTITUA COM SUAS PRÓPRIAS CHAVES
+        const SUPABASE_URL = 'https://wthcwllhzbahvnnjqlko.supabase.co';
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Ind0aGN3bGxoemJhaHZubmpxbGtvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTQ1MTk5NjMsImV4cCI6MjA3MDA5NTk2M30.7uzMcp8NsyxYuMmN7nnbBB0dJITJ_C7O7Ck0HFQgbOA';
+
+        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+        // Elementos do DOM
+        const userEmailElement = document.getElementById('user-email');
+        const logoutBtn = document.getElementById('logout-btn');
+
+        // Verificar autenticação ao carregar a página
+        async function checkAuth() {
+            try {
+                const { data: { session }, error } = await supabase.auth.getSession();
+
+                if (error) {
+                    console.error('Erro ao verificar sessão:', error);
+                    redirectToLogin();
+                    return;
+                }
+
+                if (!session) {
+                    redirectToLogin();
+                    return;
+                }
+
+                // Exibir email do usuário
+                userEmailElement.textContent = session.user.email;
+
+            } catch (error) {
+                console.error('Erro ao verificar autenticação:', error);
+                redirectToLogin();
+            }
+        }
+
+        // Redirecionar para a página de login
+        function redirectToLogin() {
+            window.location.href = 'admin.html';
+        }
+
+        // Função de logout
+        async function logout() {
+            try {
+                const { error } = await supabase.auth.signOut();
+
+                if (error) {
+                    console.error('Erro ao fazer logout:', error);
+                    alert('Erro ao fazer logout. Tente novamente.');
+                    return;
+                }
+
+                // Redirecionar para a página de login após logout
+                redirectToLogin();
+
+            } catch (error) {
+                console.error('Erro ao fazer logout:', error);
+                alert('Erro ao fazer logout. Tente novamente.');
+            }
+        }
+
+        // Adicionar evento de clique ao botão de logout
+        logoutBtn.addEventListener('click', logout);
+
+        // Adicionar eventos de clique aos cards para redirecionamento
+        document.querySelectorAll('.dashboard-card').forEach(card => {
+            card.addEventListener('click', function () {
+                const url = this.getAttribute('data-url');
+                if (url) {
+                    window.location.href = url;
+                }
+            });
+        });
+
+        // Verificar autenticação ao carregar a página
+        document.addEventListener('DOMContentLoaded', checkAuth);
+    </script>
+</body>
+
+</html>

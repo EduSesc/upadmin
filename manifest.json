@@ -1,0 +1,27 @@
+{
+  "name": "UP7 Antigos",
+  "short_name": "UP7",
+  "description": "Aplicativo voltado para o comércio de carros antigos",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#8b4513",
+  "theme_color": "#2c2c2c",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "/assets/img/favicon.ico/android-icon-96x96.png",
+      "sizes": "96x96",
+      "type": "image/png"
+    },
+    {
+      "src": "/assets/img/favicon.ico/ms-icon-144x144.png",
+      "sizes": "144x144",
+      "type": "image/png"
+    },
+    {
+      "src": "/assets/img/favicon.ico/android-icon-180x180.png",
+      "sizes": "180x180",
+      "type": "image/png"
+    }
+  ]
+}

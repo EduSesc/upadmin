@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gerenciar Promo Banners</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.4.0/axios.min.js"></script>
+    <!-- Favicon (formato .ico) -->
+    <link rel="icon" href="/assets/img/favicon.ico/favicon.ico" type="image/x-icon">
+    <!-- Favicon (PNG) -->
+    <link rel="icon" href="/assets/img/favicon.ico/android-icon-96x96.png" type="image/png">
+    <!-- Favicon para Apple -->
+    <link rel="apple-touch-icon" href="/assets/img/favicon.ico/apple-icon-180x180.png">
+    <!-- Favicon para Windows/Android -->
+    <meta name="msapplication-TileImage" content="/assets/img/favicon.ico/ms-icon-144x144.png">
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap JS  -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <link rel="stylesheet" href="/assets/css/style.css">
+    <link rel="stylesheet" href="/assets/css/stylecru.css">
+    <link rel="stylesheet" href="/assets/css/banner.css">
+
+</head>
+
+<body>
+    <!-- Header -->
+    <header class="header">
+        <nav class="navbar">
+            <div class="nav-container">
+                <div class="nav-logo">
+                    <a href="index.html" class="logo-link">
+                        <img src="assets/img/logo3.svg" alt="UP7 Antigos Logo" class="logo">
+                    </a>
+                </div>
+            </div>
+        </nav>
+    </header>
+    <div class="space"></div>
+
+    <div class="container">
+        <h1>Gerenciamento Banner Promo</h1>
+        <main>
+            <h2>Adicionar/Editar Banner</h2>
+            <form id="banner-form">
+                <input type="hidden" id="banner-id">
+
+                <label>Imagem:</label>
+                <input type="file" id="image-upload" accept="image/*">
+
+                <input type="text" id="image-url" placeholder="URL da Imagem (preenchido automaticamente)" readonly>
+
+                <label>Mensagem WhatsApp:</label>
+                <textarea id="whatsapp-message" placeholder="Digite a mensagem"></textarea>
+
+                <label>
+                    <input type="checkbox" id="is-active"> Ativo
+                </label>
+
+                <label>Data de Início:</label>
+                <input type="date" id="start-date">
+
+                <label>Data de Fim:</label>
+                <input type="date" id="end-date">
+
+                <button type="submit">Salvar Banner</button>
+            </form>
+
+            <div class="banner-list">
+                <h2>Banners Cadastrados</h2>
+                <div id="banners">
+                    <div class="loading">Carregando banners...</div>
+                </div>
+            </div>
+        </main>
+        <footer class="footer">
+            <div class="container">
+                <div class="footer-bottom">
+                    <p>&copy; 2024 UP7 Antigos. Todos os direitos reservados.</p>
+                </div>
+            </div>
+        </footer>
+
+        <script>
+            // --- CONFIGURAÇÕES ---
+            const SUPABASE_URL = "https://wthcwllhzbahvnnjqlko.supabase.co";
+            const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Ind0aGN3bGxoemJhaHZubmpxbGtvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTQ1MTk5NjMsImV4cCI6MjA3MDA5NTk2M30.7uzMcp8NsyxYuMmN7nnbBB0dJITJ_C7O7Ck0HFQgbOA";
+
+            // Inicializa Supabase
+            const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+            console.log('Supabase inicializado');
+
+            const CLOUD_NAME = "du53gt50t";
+            const UPLOAD_PRESET = "ml_default";
+
+            // --- EVENT DELEGATION PARA OS BOTÕES ---
+            document.getElementById('banners').addEventListener('click', function (e) {
+                const target = e.target;
+
+                // Verifica se é um botão de editar
+                if (target.textContent === 'Editar' && target.classList.contains('edit-btn')) {
+                    const bannerId = target.getAttribute('data-id');
+                    console.log('Clicou em editar banner:', bannerId);
+                    editBanner(bannerId);
+                }
+
+                // Verifica se é um botão de excluir
+                if (target.textContent === 'Excluir' && target.classList.contains('delete-btn')) {
+                    const bannerId = target.getAttribute('data-id');
+                    console.log('Clicou em excluir banner:', bannerId);
+                    deleteBanner(bannerId);
+                }
+            });
+
+            // --- FUNÇÕES ---
+            async function editBanner(id) {
+                try {
+                    console.log('Editando banner ID:', id);
+                    const { data, error } = await supabaseClient
+                        .from("promo_banners")
+                        .select("*")
+                        .eq("id", id)
+                        .single();
+
+                    if (error) throw error;
+
+                    document.getElementById("banner-id").value = data.id;
+                    document.getElementById("image-url").value = data.image_url;
+                    document.getElementById("whatsapp-message").value = data.whatsapp_message;
+                    document.getElementById("is-active").checked = data.is_active;
+                    document.getElementById("start-date").value = data.start_date;
+                    document.getElementById("end-date").value = data.end_date;
+
+                    alert('Banner carregado para edição!');
+                } catch (error) {
+                    console.error("Erro ao editar banner:", error);
+                    alert("Erro ao carregar dados do banner");
+                }
+            }
+
+            async function deleteBanner(id) {
+                if (!confirm("Tem certeza que deseja excluir este banner?")) return;
+
+                try {
+                    const { error } = await supabaseClient
+                        .from("promo_banners")
+                        .delete()
+                        .eq("id", id);
+
+                    if (error) throw error;
+
+                    alert("Banner excluído com sucesso!");
+                    loadBanners();
+                } catch (error) {
+                    console.error("Erro ao excluir banner:", error);
+                    alert("Erro ao excluir banner");
+                }
+            }
+
+            // --- UPLOAD CLOUDINARY ---
+            document.getElementById("image-upload").addEventListener("change", async (e) => {
+                const file = e.target.files[0];
+                if (!file) return;
+
+                const formData = new FormData();
+                formData.append("file", file);
+                formData.append("upload_preset", UPLOAD_PRESET);
+
+                try {
+                    const res = await axios.post(
+                        `https://api.cloudinary.com/v1_1/${CLOUD_NAME}/image/upload`,
+                        formData
+                    );
+                    document.getElementById("image-url").value = res.data.secure_url;
+                } catch (err) {
+                    alert("Erro no upload da imagem");
+                }
+            });
+
+            // --- LISTAR BANNERS ---
+            async function loadBanners() {
+                try {
+                    const { data, error } = await supabaseClient
+                        .from("promo_banners")
+                        .select("*")
+                        .order("start_date", { ascending: false });
+
+                    if (error) throw error;
+
+                    const container = document.getElementById("banners");
+
+                    if (data.length === 0) {
+                        container.innerHTML = "<p>Nenhum banner cadastrado</p>";
+                        return;
+                    }
+
+                    container.innerHTML = '';
+
+                    data.forEach(banner => {
+                        const div = document.createElement("div");
+                        div.classList.add("banner-card");
+                        div.innerHTML = `
+            <img src="${banner.image_url}" alt="banner" onerror="this.src='https://via.placeholder.com/100x50?text=Imagem+não+encontrada'">
+            <div class="banner-info">
+              <p><strong>Mensagem:</strong> ${banner.whatsapp_message.substring(0, 50)}${banner.whatsapp_message.length > 50 ? '...' : ''}</p>
+              <p><strong>Ativo:</strong> ${banner.is_active ? "Sim" : "Não"}</p>
+              <p><strong>Início:</strong> ${banner.start_date}</p>
+              <p><strong>Fim:</strong> ${banner.end_date}</p>
+            </div>
+            <div class="actions">
+              <button class="edit-btn" data-id="${banner.id}">Editar</button>
+              <button class="delete-btn" data-id="${banner.id}">Excluir</button>
+            </div>
+          `;
+                        container.appendChild(div);
+                    });
+                } catch (error) {
+                    console.error("Erro ao carregar banners:", error);
+                    document.getElementById("banners").innerHTML =
+                        `<div class="error">Erro ao carregar banners</div>`;
+                }
+            }
+
+            // --- SALVAR/EDITAR ---
+            document.getElementById("banner-form").addEventListener("submit", async (e) => {
+                e.preventDefault();
+
+                const id = document.getElementById("banner-id").value;
+                const imageUrl = document.getElementById("image-url").value;
+
+                if (!imageUrl) {
+                    alert("Por favor, faça upload de uma imagem");
+                    return;
+                }
+
+                const newBanner = {
+                    image_url: imageUrl,
+                    whatsapp_message: document.getElementById("whatsapp-message").value,
+                    is_active: document.getElementById("is-active").checked,
+                    start_date: document.getElementById("start-date").value,
+                    end_date: document.getElementById("end-date").value,
+                };
+
+                try {
+                    let error;
+                    if (id) {
+                        ({ error } = await supabaseClient.from("promo_banners").update(newBanner).eq("id", id));
+                    } else {
+                        ({ error } = await supabaseClient.from("promo_banners").insert(newBanner));
+                    }
+
+                    if (error) throw error;
+
+                    alert("Banner salvo!");
+                    document.getElementById("banner-form").reset();
+                    document.getElementById("banner-id").value = "";
+                    document.getElementById("image-upload").value = "";
+                    loadBanners();
+                } catch (error) {
+                    console.error("Erro ao salvar banner:", error);
+                    alert("Erro ao salvar banner");
+                }
+            });
+
+            // --- INICIALIZAÇÃO ---
+            document.addEventListener('DOMContentLoaded', function () {
+                loadBanners();
+            });
+        </script>
+
+</body>
+
+</html>

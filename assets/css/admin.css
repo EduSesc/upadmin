@@ -1,0 +1,273 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: "Roboto", sans-serif;
+}
+
+body {
+  font-family: "Roboto", sans-serif;
+  line-height: 1.6;
+  color: #333;
+  background-image: url("https://i.ibb.co/WvWhgh8z/Captura-de-tela-2025-08-22-215542.png");
+  background-size: cover;
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 20px;
+}
+
+.loading-screen {
+  display: none; /* não aparece por padrão */
+}
+
+/* ===== HEADER AND NAVIGATION ===== */
+.header {
+  background-color: var(--primary-dark);
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 1000;
+}
+
+.navbar {
+  position: fixed; /* ou sticky */
+  width: 100%;
+  top: 0;
+  left: 0;
+  transition: background-color 0.3s ease; /* Adiciona transição suave */
+  background-color: transparent; /* Inicialmente transparente */
+  z-index: 1000; /* Garante que fique acima de outros elementos */
+}
+
+/* Quando rolar, fica transparente */
+.navbar.scrolled {
+  background-color: transparent; /* Mantém transparente */
+}
+
+.nav-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  position: relative;
+  width: 100%;
+}
+
+.logo {
+  height: 100px;
+  width: auto;
+  padding: 0 10px;
+  transition: var(--transition-medium);
+}
+
+.logo:hover {
+  transform: scale(1.05);
+}
+
+.logologin {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+}
+
+.container {
+  width: 100%;
+  max-width: 450px;
+  background: rgba(255, 255, 255, 0.9);
+  border-radius: 15px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+  overflow: hidden;
+}
+
+.logo-container {
+  background: #2c3e50;
+  padding: 0;
+  text-align: center;
+}
+
+.logo {
+  color: white;
+  font-size: 28px;
+  font-weight: 700;
+  letter-spacing: 1.5px;
+}
+
+.logo span {
+  color: #fdbb2d;
+}
+
+.login-form {
+  padding: 30px;
+}
+
+h2 {
+  text-align: center;
+  color: #2c3e50;
+  margin-bottom: 25px;
+  font-size: 24px;
+}
+
+.form-group {
+  margin-bottom: 20px;
+}
+
+label {
+  display: block;
+  margin-bottom: 8px;
+  color: #2c3e50;
+  font-weight: 500;
+}
+
+input {
+  width: 100%;
+  padding: 14px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  font-size: 16px;
+  transition: border 0.3s;
+}
+
+input:focus {
+  border-color: #3498db;
+  outline: none;
+}
+
+.login-btn {
+  width: 100%;
+  padding: 14px;
+  background: #3498db;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 16px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.3s;
+}
+
+.login-btn:hover {
+  background: #2980b9;
+}
+
+.error-message {
+  color: #e74c3c;
+  text-align: center;
+  margin-top: 15px;
+  font-size: 14px;
+  display: none;
+}
+
+.success-message {
+  color: #27ae60;
+  text-align: center;
+  margin-top: 15px;
+  font-size: 14px;
+  display: none;
+}
+
+.instructions {
+  margin-top: 25px;
+  padding: 15px;
+  background: #f8f9fa;
+  border-radius: 8px;
+  font-size: 14px;
+  color: #555;
+}
+
+.instructions h3 {
+  margin-bottom: 10px;
+  color: #2c3e50;
+}
+
+.instructions ol {
+  padding-left: 20px;
+}
+
+.instructions li {
+  margin-bottom: 8px;
+}
+
+.loader {
+  display: none;
+  text-align: center;
+  margin-top: 15px;
+}
+
+.loader i {
+  font-size: 20px;
+  color: #3498db;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+@media (max-width: 768px) {
+  body {
+    padding: 15px;
+    background-attachment: scroll;
+    background-position: center;
+    background-size: cover; 
+  }
+  .container {
+    border-radius: 10px;
+  }
+
+  .logo-container {
+    padding: 0;
+  }
+
+  .login-form {
+    padding: 20px;
+  }
+  .logo {
+    height: 50px;
+  }
+}
+
+@media (max-height: 600px) and (orientation: portrait) {
+  body {
+    align-items: flex-start;
+  }
+}
+
+.loading-screen {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: #fff;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.spinner {
+  width: 40px;
+  height: 40px;
+  border: 4px solid #f3f3f3;
+  border-top: 4px solid #007bff;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}

@@ -1,0 +1,437 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gerenciar Vídeos</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.4.0/axios.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <!-- Favicon (formato .ico) -->
+    <link rel="icon" href="/assets/img/favicon.ico/favicon.ico" type="image/x-icon">
+    <!-- Favicon (PNG) -->
+    <link rel="icon" href="/assets/img/favicon.ico/android-icon-96x96.png" type="image/png">
+    <!-- Favicon para Apple -->
+    <link rel="apple-touch-icon" href="/assets/img/favicon.ico/apple-icon-180x180.png">
+    <!-- Favicon para Windows/Android -->
+    <meta name="msapplication-TileImage" content="/assets/img/favicon.ico/ms-icon-144x144.png">
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap JS  -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <link rel="stylesheet" href="/assets/css/style.css">
+    <link rel="stylesheet" href="/assets/css/crudvideos.css">
+
+
+</head>
+
+<body>
+
+    <!-- Menu Mobile Inferior -->
+    <div class="mobile-bottom-nav">
+        <a href="dashboard.html" class="mobile-nav-item">
+            <i class="fas fa-home"></i>
+        </a>
+        <a href="crud.html" class="mobile-nav-item">
+            <i class="fas fa-car"></i>
+        </a>
+        <a href="crudvideos.html" class="mobile-nav-item active">
+            <i class="fas fa-video"></i>
+        </a>
+        <a href="crudeventos.html" class="mobile-nav-item">
+            <i class="fas fa-calendar-alt"></i>
+        </a>
+        <a href="crudsorteios.html" class="mobile-nav-item">
+            <i class="fas fa-gift"></i>
+        </a>
+        <a href="crudbanner.html" class="mobile-nav-item">
+            <i class="fas fa-image"></i>
+        </a>
+
+    </div>
+
+    <!-- Header -->
+    <header class="header">
+        <nav class="navbar">
+            <div class="nav-container">
+                <div class="nav-logo">
+                    <a href="index.html" class="logo-link">
+                        <img src="assets/img/logo3.svg" alt="UP7 Antigos Logo" class="logo">
+                    </a>
+                </div>
+                <div class="nav-menu">
+                    <a href="dashboard.html" class="nav-link">Dashboard</a>
+                    <a href="crud.html" class="nav-link">Carros</a>
+                    <a href="crudvideos.html" class="nav-link active">Vídeos</a>
+                    <a href="crudeventos.html" class="nav-link">Eventos</a>
+                    <a href="sorteios.html" class="nav-link">Sorteios</a>
+                </div>
+                <div class="nav-actions">
+                    <!-- Botão WhatsApp -->
+                    <a href="https://wa.me/5561985807280" class="whatsapp-header">
+                        <i class="fab fa-whatsapp"></i>
+                    </a>
+                </div>
+            </div>
+        </nav>
+    </header>
+    <div class="space"><br></div>
+
+    <div class="container">
+        <h1 class="sombra"><br>Gerenciamento de Vídeos - UP7 Antigos</h1>
+
+        <!-- Alertas -->
+        <div id="alert-success" class="alert alert-success"></div>
+        <div id="alert-error" class="alert alert-error"></div>
+
+        <main>
+            <form id="video-form">
+                <div class="form-row">
+                <div class="editing-indicator" id="editing-indicator">Editando</div>
+                <input type="hidden" id="video-id">
+
+                <label for="title">Título:</label>
+                <input type="text" id="title" placeholder="Título do vídeo" required>
+
+                <label for="description">Descrição:</label>
+                <textarea id="description" placeholder="Descrição do vídeo" rows="3"></textarea>
+                </div>
+
+                <div class="form-row">
+                <label for="youtube-url">URL do YouTube:</label>
+                <input type="url" id="youtube-url" placeholder="https://www.youtube.com/embed/..." required>
+                <div id="youtube-id-display" class="youtube-id">ID do YouTube: </div>
+
+                <label for="thumbnail-upload">Thumbnail (opcional):</label>
+                <input type="file" id="thumbnail-upload" accept="image/*">
+                <input type="text" id="thumbnail-url" placeholder="URL da Thumbnail (preenchido automaticamente)"
+                    readonly>
+                </div>
+
+                <div class="form-row">
+                <label for="duration">Duração (min:seg):</label>
+                <input type="text" id="duration" placeholder="Ex: 15:30" pattern="[0-9]{1,3}:[0-5][0-9]">
+
+                <div class="checkbox-container">
+                    <label class="checkbox-label">
+                        <input type="checkbox" id="is-active" class="checkbox-input" checked>
+                        <span class="custom-checkbox"></span>
+                        <span class="checkbox-text">Ativo</span>
+                    </label>
+                </div>
+                </div>
+
+                <div class="form-buttons">
+                    <button type="submit" class="submit-btn">Salvar Vídeo</button>
+                    <button type="button" class="cancel-btn" id="cancel-edit">Cancelar Edição</button>
+                </div>
+            </form>
+
+            <div class="video-list">
+                <h2>Vídeos Cadastrados</h2>
+                <div id="videos">
+                    <div class="loading">Carregando vídeos...</div>
+                </div>
+            </div>
+        </main>
+        <footer class="footer">
+            <div class="container">
+                <div class="footer-bottom">
+                    <p>&copy; 2024 UP7 Antigos. Todos os direitos reservados.</p>
+                </div>
+            </div>
+        </footer>
+
+        <script>
+            // --- CONFIGURAÇÕES ---
+            const SUPABASE_URL = "https://wthcwllhzbahvnnjqlko.supabase.co";
+            const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Ind0aGN3bGxoemJhaHZubmpxbGtvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTQ1MTk5NjMsImV4cCI6MjA3MDA5NTk2M30.7uzMcp8NsyxYuMmN7nnbBB0dJITJ_C7O7Ck0HFQgbOA";
+
+            // Inicializa Supabase
+            const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+            console.log('Supabase inicializado');
+
+            const CLOUD_NAME = "du53gt50t";
+            const UPLOAD_PRESET = "ml_default";
+
+            // --- FUNÇÕES AUXILIARES ---
+            function showAlert(message, type) {
+                const alertElement = type === 'success'
+                    ? document.getElementById('alert-success')
+                    : document.getElementById('alert-error');
+
+                alertElement.textContent = message;
+                alertElement.style.display = 'block';
+
+                // Esconder o alerta após 5 segundos
+                setTimeout(() => {
+                    alertElement.style.display = 'none';
+                }, 5000);
+            }
+
+            // Função para extrair ID do YouTube a partir de diferentes formatos de URL
+            function extractYouTubeId(url) {
+                const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
+                const match = url.match(regExp);
+                return (match && match[2].length === 11) ? match[2] : null;
+            }
+
+            // Função para cancelar a edição
+            function cancelEdit() {
+                document.getElementById("video-form").reset();
+                document.getElementById("video-id").value = "";
+                document.getElementById("thumbnail-upload").value = "";
+                document.getElementById("youtube-id-display").textContent = "ID do YouTube: ";
+
+                // Esconder o botão de cancelar e o indicador de edição
+                document.getElementById("cancel-edit").style.display = "none";
+                document.getElementById("editing-indicator").style.display = "none";
+
+                showAlert("Edição cancelada", 'success');
+            }
+
+            // --- EVENT DELEGATION PARA OS BOTÕES ---
+            document.getElementById('videos').addEventListener('click', function (e) {
+                const target = e.target;
+
+                // Verifica se é um botão de editar
+                if (target.textContent === 'Editar' && target.classList.contains('edit-btn')) {
+                    const videoId = target.getAttribute('data-id');
+                    console.log('Clicou em editar vídeo:', videoId);
+                    editVideo(videoId);
+                }
+
+                // Verifica se é um botão de excluir
+                if (target.textContent === 'Excluir' && target.classList.contains('delete-btn')) {
+                    const videoId = target.getAttribute('data-id');
+                    console.log('Clicou em excluir vídeo:', videoId);
+                    deleteVideo(videoId);
+                }
+            });
+
+            // Event listener para o botão de cancelar
+            document.getElementById('cancel-edit').addEventListener('click', cancelEdit);
+
+            // --- FUNÇÕES PRINCIPAIS ---
+            async function editVideo(id) {
+                try {
+                    console.log('Editando vídeo ID:', id);
+                    const { data, error } = await supabaseClient
+                        .from("videos")
+                        .select("*")
+                        .eq("id", id)
+                        .single();
+
+                    if (error) throw error;
+
+                    document.getElementById("video-id").value = data.id;
+                    document.getElementById("title").value = data.title;
+                    document.getElementById("description").value = data.description || '';
+                    document.getElementById("youtube-url").value = data.youtube_url;
+                    document.getElementById("thumbnail-url").value = data.thumbnail_url || '';
+                    document.getElementById("duration").value = data.duration || '';
+                    document.getElementById("is-active").checked = data.is_active;
+
+                    // Atualizar exibição do ID do YouTube
+                    const youtubeId = extractYouTubeId(data.youtube_url);
+                    document.getElementById("youtube-id-display").textContent = youtubeId
+                        ? `ID do YouTube: ${youtubeId}`
+                        : 'ID do YouTube: Não identificado';
+
+                    // Mostrar botão de cancelar e indicador de edição
+                    document.getElementById("cancel-edit").style.display = "block";
+                    document.getElementById("editing-indicator").style.display = "block";
+
+                    showAlert('Vídeo carregado para edição!', 'success');
+
+                    // Rolar para o formulário
+                    document.getElementById('video-form').scrollIntoView({ behavior: 'smooth' });
+                } catch (error) {
+                    console.error("Erro ao editar vídeo:", error);
+                    showAlert("Erro ao carregar dados do vídeo", 'error');
+                }
+            }
+
+            async function deleteVideo(id) {
+                if (!confirm("Tem certeza que deseja excluir este vídeo?")) return;
+
+                try {
+                    const { error } = await supabaseClient
+                        .from("videos")
+                        .delete()
+                        .eq("id", id);
+
+                    if (error) throw error;
+
+                    showAlert("Vídeo excluído com sucesso!", 'success');
+                    loadVideos();
+                } catch (error) {
+                    console.error("Erro ao excluir vídeo:", error);
+                    showAlert("Erro ao excluir vídeo", 'error');
+                }
+            }
+
+            // --- UPLOAD CLOUDINARY ---
+            document.getElementById("thumbnail-upload").addEventListener("change", async (e) => {
+                const file = e.target.files[0];
+                if (!file) return;
+
+                const formData = new FormData();
+                formData.append("file", file);
+                formData.append("upload_preset", UPLOAD_PRESET);
+
+                try {
+                    showAlert("Fazendo upload da thumbnail...", 'success');
+                    const res = await axios.post(
+                        `https://api.cloudinary.com/v1_1/${CLOUD_NAME}/image/upload`,
+                        formData
+                    );
+                    document.getElementById("thumbnail-url").value = res.data.secure_url;
+                    showAlert("Thumbnail enviada com sucesso!", 'success');
+                } catch (err) {
+                    console.error("Erro no upload:", err);
+                    showAlert("Erro no upload da imagem", 'error');
+                }
+            });
+
+            // --- LISTAR VÍDEOS ---
+            async function loadVideos() {
+                try {
+                    const { data, error } = await supabaseClient
+                        .from("videos")
+                        .select("*")
+                        .order("created_at", { ascending: false });
+
+                    if (error) throw error;
+
+                    const container = document.getElementById("videos");
+
+                    if (data.length === 0) {
+                        container.innerHTML = "<p>Nenhum vídeo cadastrado</p>";
+                        return;
+                    }
+
+                    container.innerHTML = '';
+
+                    data.forEach(video => {
+                        // Extrair ID do YouTube
+                        const videoId = extractYouTubeId(video.youtube_url);
+
+                        // Usar thumbnail personalizada se disponível, caso contrário usar thumbnail do YouTube
+                        const thumbnailUrl = video.thumbnail_url ||
+                            (videoId ? `https://img.youtube.com/vi/${videoId}/hqdefault.jpg` :
+                                'https://via.placeholder.com/160x90?text=Sem+thumbnail');
+
+                        const div = document.createElement("div");
+                        div.classList.add("video-card");
+                        div.innerHTML = `
+                            <div class="video-thumbnail">
+                                <img src="${thumbnailUrl}" 
+                                     alt="${video.title}" 
+                                     onerror="this.src='https://via.placeholder.com/160x90?text=Imagem+não+encontrada'">
+                                <div class="play-button">▶</div>
+                                ${video.duration ? `<span class="video-duration">${video.duration}</span>` : ''}
+                            </div>
+                            <div class="video-info">
+                                <h3>${video.title}</h3>
+                                <p>${video.description || 'Sem descrição'}</p>
+                                <p><strong>Status:</strong> <span class="status-badge ${video.is_active ? 'status-active' : 'status-inactive'}">${video.is_active ? "Ativo" : "Inativo"}</span></p>
+                                <p><strong>Data de criação:</strong> ${new Date(video.created_at).toLocaleDateString('pt-BR')}</p>
+                                ${videoId ? `<p class="youtube-id">ID do YouTube: ${videoId}</p>` : ''}
+                            </div>
+                            <div class="actions">
+                                <button class="edit-btn" data-id="${video.id}">Editar</button>
+                                <button class="delete-btn" data-id="${video.id}">Excluir</button>
+                            </div>
+                        `;
+                        container.appendChild(div);
+                    });
+                } catch (error) {
+                    console.error("Erro ao carregar vídeos:", error);
+                    document.getElementById("videos").innerHTML =
+                        `<div class="error">Erro ao carregar vídeos: ${error.message}</div>`;
+                }
+            }
+
+            // --- SALVAR/EDITAR ---
+            document.getElementById("video-form").addEventListener("submit", async (e) => {
+                e.preventDefault();
+
+                const id = document.getElementById("video-id").value;
+                const youtubeUrl = document.getElementById("youtube-url").value;
+
+                // Validação básica da URL do YouTube
+                if (!youtubeUrl.includes('youtube.com') && !youtubeUrl.includes('youtu.be')) {
+                    showAlert("Por favor, insira uma URL válida do YouTube", 'error');
+                    return;
+                }
+
+                const newVideo = {
+                    title: document.getElementById("title").value,
+                    description: document.getElementById("description").value,
+                    youtube_url: youtubeUrl,
+                    thumbnail_url: document.getElementById("thumbnail-url").value,
+                    duration: document.getElementById("duration").value,
+                    is_active: document.getElementById("is-active").checked,
+                };
+
+                try {
+                    let error;
+                    if (id) {
+                        ({ error } = await supabaseClient.from("videos").update(newVideo).eq("id", id));
+                    } else {
+                        ({ error } = await supabaseClient.from("videos").insert(newVideo));
+                    }
+
+                    if (error) throw error;
+
+                    showAlert("Vídeo salvo com sucesso!", 'success');
+
+                    // Limpar formulário e esconder botão de cancelar
+                    document.getElementById("video-form").reset();
+                    document.getElementById("video-id").value = "";
+                    document.getElementById("thumbnail-upload").value = "";
+                    document.getElementById("youtube-id-display").textContent = "ID do YouTube: ";
+                    document.getElementById("cancel-edit").style.display = "none";
+                    document.getElementById("editing-indicator").style.display = "none";
+
+                    loadVideos();
+                } catch (error) {
+                    console.error("Erro ao salvar vídeo:", error);
+                    showAlert("Erro ao salvar vídeo: " + error.message, 'error');
+                }
+            });
+
+            // --- INICIALIZAÇÃO ---
+            document.addEventListener('DOMContentLoaded', function () {
+                loadVideos();
+
+                // Adicionar validação para o campo de duração
+                document.getElementById('duration').addEventListener('input', function (e) {
+                    const value = e.target.value;
+                    if (!/^[0-9]{0,3}:[0-5]?[0-9]?$/.test(value)) {
+                        e.target.setCustomValidity('Formato inválido. Use mm:ss (ex: 15:30)');
+                    } else {
+                        e.target.setCustomValidity('');
+                    }
+                });
+
+                // Atualizar ID do YouTube quando a URL for alterada
+                document.getElementById('youtube-url').addEventListener('input', function (e) {
+                    const youtubeId = extractYouTubeId(e.target.value);
+                    document.getElementById("youtube-id-display").textContent = youtubeId
+                        ? `ID do YouTube: ${youtubeId}`
+                        : 'ID do YouTube: Não identificado';
+                });
+            });
+        </script>
+
+</body>
+
+
+</html>
+
